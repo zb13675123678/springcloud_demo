@@ -1,0 +1,46 @@
+server:
+  port: 50000
+spring:
+  application:
+    name: config-server
+
+#配置config-server分布式配置中心
+#(方式一)配置文件存在在本地(项目下)
+# profiles:    #读取本地配置文件,强制需要配置该属性,私有云,公有云配置去掉即可
+#   active: native
+# cloud:
+#   config:
+#     server:
+#      native:
+#         #存放在本地项目根路径下(resources)的config文件夹下
+#        search-locations: classpath:config
+#        default-label: master #master分支
+
+# (方式二)配置在私有云(SVN)
+#       svn:
+#         uri: #svn仓库地址
+#         search-paths: config
+#         default-label: master #master分支
+
+#(方式三)配置文件在公有云(码云,github)
+  cloud:
+    config:
+      server:
+         git:
+           #git地址
+           uri: https://github.com/zb13675123678/config-repo.git
+           #配置文件搜索的位置路径(可配置多个,逗号分隔)
+           search-paths: config
+           #账号密码
+           username: 1048985901@qq.com
+           password: 749948199zbb...
+
+  #基于rabbitmq的统一配置文件自动刷新
+  rabbitmq:
+    #消息队列地址
+    host:
+    #消息中间件端口号
+    port: 5672
+    #用户名和密码
+    username: guest
+    password: guest

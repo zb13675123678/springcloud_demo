@@ -1,0 +1,31 @@
+server:
+  port: 40000
+
+#配置eureka注册中心
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:20000/eureka
+
+spring:
+  application:
+    name: gateway-server
+    #配置路由网关的路由规则(将指定规则路径请求,分配给指定微服务集群)
+  cloud:
+    gateway:
+      routes:
+        - id: guize1  #id:规则标识,是一个合法不重复的字符串即可
+          predicates:  #predicates:路由规则,什么样的请求,匹配当前这个规则
+             #http://localhost:40000/student/**
+             - Path=/student/**
+          #http://MIRCO-STUDENT/student/**
+          uri: lb://MIRCO-STUDENT  #当前规则,分发给指定微服务
+        - id: guize2
+          predicates:
+             - Path=/class/**
+          uri: lb://MIRCO-CLASS
+        - id: guize3
+          predicates:
+              - Path=/teacher/**
+          uri: lb://MIRCO-TEACHER
+

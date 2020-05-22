@@ -1,0 +1,32 @@
+#bootstrap.yml用法和application.yml的用法完全一致，
+#但是在SpringBoot启动过程中，是先加载bootstrap.yml再加载application.yml
+
+
+#配置分布式配置中心:客户端
+Sping:
+  cloud:
+    config:
+      #配置分布式配置中心的地址
+      uri: http://localhost:50000
+      #对应在分布式配置中心的文件名
+      name: teacher  #dev开发阶段-->test测试阶段-->prod生产阶段
+      #配置运行环境的配置文件(这里选择开发阶段)
+      profile: prod  #底层方法应该是截取文件名的方式判断
+      #配置分支
+      label: master
+      discovery:
+        #开启配置信息查找
+#        enable: true
+        #指定配置中心的微服务名id:   便于后期拓展为高可用的集群,只需重新指定即可
+#        serviceId: config-server
+
+#基于rabbitmq的统一配置文件自动刷新
+  #基于rabbitmq的统一配置文件自动刷新
+  rabbitmq:
+    #消息队列地址
+    host:
+    #消息中间件端口号
+    port: 5672
+    #用户名和密码
+    username: guest
+    password: guest

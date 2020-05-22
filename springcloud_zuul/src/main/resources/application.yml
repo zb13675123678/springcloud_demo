@@ -1,0 +1,98 @@
+server:
+  port: 40001
+spring:
+  application:
+    name: zuul-server
+
+#配置eureka注册中心
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:20000/eureka
+
+#配置zuul路由网关#########################################
+zuul:
+  #路由配置
+  routes:
+    zuul1: #学生微服务的路由规则
+      #符合规则url:http://localhost:40001/student/**
+      path: /student/**
+      #转发到微服务url: http:///MIRCO-STUDENT/**
+      serviceID: MIRCO-STUDENT
+      #关闭截取student http:///MIRCO-STUDENT/student/**
+      stripPrefix: false
+      #是否可以携带cookie:
+      sensitiveHeaders:
+      #保护敏感路径
+    zuul2: #班级微服务的路由规则
+      path: /class/**
+      serviceID: MIRCO-CLASS
+      stripPrefix: false
+    zuul3: #教师微服务的路由规则
+      path: /teacher/**
+      serviceID: MIRCO-TEACHER
+      stripPrefix: false
+  #路由排除配置#############################################################
+  #排除路径:符合规则的url,都不被zuul网关代理 (也叫保护敏感路径)
+  ignored-patterns: /**/test/**
+  #排除微服务: 符合的多个微服务,都不被zuul网关代理(多个微服务用逗号分割)
+  #ignored-services: MIRCO-TEACHER
+
+
+  #######配置网关限流:限流不走服务降级,直接抛error类型异常过滤器(异常码:409 请求次数太多)#######################################
+  rateLimit:
+    #开启限流保护
+    enabled: true
+    ####全局限流配置(统一限流)##########
+    default-policy:
+      #统计时长,单位秒(刷新时间)
+      refresh-interval: 60
+      #每个统计时长内,限制的请求数 (60s内请求超过3次,服务端就抛出异常,60后恢复正常请求)
+      limit: 3
+      #每个统计时长内,限制允许访问的时间
+      quota: 6
+      #限流的类型:针对什么请求进行限流:(常用值:origin:针对访问ip限流; URL:针对访问URL限流)
+      type: origin
+    ####局部限流(个性化限流)##########
+    policies:
+      MIRCO-STUDENT:
+        refresh-interval: 60
+        limit: 3
+        quota: 6
+        type: origin
+
+
+  ##############Zuul网关性能的调优:配置超时与重试:######################################
+  #导入:如果Hystrix超时，直接返回超时异常。
+  #     如果ribbon超时，同时Hystrix未超时，ribbon会自动进行服务集群轮询重试，直到Hystrix超时为止。
+  #      如果Hystrix超时时长小于ribbon超时时长，ribbon不会进行服务集群轮询重试。
+
+  #开启zuul网关重试
+  retryable: true
+  #配置zuul路由超时(zuul的底层超时)
+  host:
+    connect-timeout-millis: 5000
+    socket-timeout-millis: 5000
+
+# ribbon超时时间设置：建议设置比Hystrix小
+ribbon:
+  #配置连接超时
+  ConnectTimeout: 5000
+  #配置读超时
+  ReadTimeout: 5000
+  # 重试次数：MaxAutoRetries表示访问服务集群下原节点（同路径访问）
+  #          MaxAutoRetriesNextServer表示访问服务集群下其余节点（换台服务器）
+  #          OkToRetryOnAllOperations开启重试
+  MaxAutoRetries: 1
+  MaxAutoRetriesNextServer: 1
+  OkToRetryOnAllOperations: true
+
+
+#hystrix超时时间设置
+hystrix:
+  command:
+    default: #default表示默认,可以填具体微服务
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 8000

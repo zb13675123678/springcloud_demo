@@ -1,0 +1,11 @@
+# Project exclude paths
+/springcloud_config_client/target/
+/springcloud_config_server/target/
+/springcloud_eureka/target/
+/springcloud_eureka_cluster1/target/
+/springcloud_eureka_cluster2/target/
+/springcloud_eureka_cluster3/target/
+/springcloud_gateway/target/
+/springcloud_mircoservice_class/target/
+/springcloud_mircoservice_student/target/
+/springcloud_mircoservice_teacher/target/

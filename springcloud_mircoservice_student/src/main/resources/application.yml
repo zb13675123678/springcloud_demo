@@ -1,0 +1,15 @@
+server:
+  port: 8080
+  #微服务的名字
+spring:
+  application:
+    #微服务的名字(一定不要用下划线)
+    name: mirco-student
+eureka:
+  client:
+    service-url:
+      #配置注册中心的服务地址(因为微服务需要注册和抓取服务,其他两和配置可以省略,默认即可)
+      #集群注册地址
+      #defaultZone: http://eureka1:20001/eureka,http://eureka2:20002/eureka,http://eureka3:20003/eureka
+      defaultZone: http://localhost:20000/eureka
+

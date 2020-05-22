@@ -1,0 +1,73 @@
+server:
+  port: 8081
+#微服务的名字
+spring:
+  application:
+    #微服务的名字(一定不要用下划线)
+    name: mirco-class
+
+#注册中心
+eureka:
+  client:
+    service-url:
+      #配置注册中心的服务地址(因为微服务需要注册和抓取服务,其他两和配置可以省略,默认即可)
+      #集群注册地址
+      #defaultZone: http://eureka1:20001/eureka,http://eureka2:20002/eureka,http://eureka3:20003/eureka
+      defaultZone: http://localhost:20000/eureka
+
+#远程调用参数(Feifn底层ribbon)
+ribbon:
+  #配置连接超时
+  ConnectTimeout: 1000
+  #配置读超时
+  ReadTimeout: 1000
+  #配置riboon的重试次数(默认是0)
+  MaxAutoRetries: 0
+  #配置ribbon的集群重试次数(默认为1),没有集群,就继续访问本微服务
+  MaxAutoRetriesNextServer: 0
+
+    #MaxAutoRetriesNextServer为m， 表示会重试(m + 1)个实例
+    #MaxAutoRetries为n，表示单实例重试(n + 1)次
+    #总的执行次数 (n + 1) * (m + 1)
+
+
+#Feign远程调用,一端配置了Fegin,ribbon的配置就会失效
+#feign:
+#  client:
+#    config: #Feign的好处:可以针对调用不同的微服务配置不同的参数,而ribbon调用只能全部相同.
+#     MIRCO-TEACHER: #配置远程调用教师微服务
+#        connectTimeout: 1000
+#        readTimeout: 1000
+#      MIRCO-STUDENT:
+#        connectTimeout: 1000
+#       readTimeout: 1000
+
+
+#开启Hystrix断路器(默认关闭)
+feign:
+  hystrix:
+    enabled: true
+
+#配置Hystrix熔断器
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          #资源隔离策略:线程池隔离(默认),信号量隔离(SEMAPHORE)
+          strategy: THREAD
+          #hystrix全局方法超时时间(默认一秒)
+          thread:
+             timeoutInMilliseconds: 5000
+        timeout:
+          #是否开启Hystrix的超时时间， 默认为true，如果设置为false，
+          #意为不超时，但是Feign的超时仍然起作用
+          enabled: true
+      #熔断器的相关配置，默认打开熔断器
+      circuitBreaker:
+        enabled: true
+        #单位时间内，失败的次数，如果达到这个阈值，那么熔断器就会打开，默认20次
+        requestVolumeThreshold: 5
+        #熔断打开后，熔断器进入半开状态，默认5S
+        sleepWindowInMilliseconds: 10000
+
